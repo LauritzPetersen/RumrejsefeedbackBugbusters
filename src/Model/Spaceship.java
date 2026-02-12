@@ -54,13 +54,13 @@ public class Spaceship {
     }
 
     public void useRepairKit(int amount){
-        this.spareParts -= amount;
-        if (this.spareParts < 0){
-            spareParts = 0;
+        this.repairKit -= amount;
+        if (this.repairKit < 0){
+            repairKit = 0;
         }
     }
     public void gainRepairKit(int amount){
-        this.spareParts += amount;
+        this.repairKit += amount;
     }
 
 

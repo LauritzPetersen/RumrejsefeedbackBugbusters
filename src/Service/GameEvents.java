@@ -126,7 +126,7 @@ public class GameEvents {
                 if (choice == 1) {
                     handleTrade();
                 } else if (choice == 2) {
-                    handleReapirKitPurchase();
+                    handleRepairKitPurchase();
                 } else if (choice == 3) {
                     handleShieldPurchase();
                 } else if (choice == 4) {
@@ -177,7 +177,7 @@ public class GameEvents {
         log.add("Event TradeStation: Opgraderede Shield.");
     }
 
-    private void handleReapirKitPurchase() {
+    private void handleRepairKitPurchase() {
         int cost = 15;
         if (spaceship.getSpareParts() < cost) {
             throw new InvalidTradeException("Mangler reservedele (Koster " + cost + ", du har " + spaceship.getSpareParts() + ")");
@@ -189,50 +189,60 @@ public class GameEvents {
     }
 
     public void eventEngine() {
-        boolean stopped = true;
-        while(true) {
-            gameView.printMessage("\n----Event Motorfejl----\n" +
-                    "Din motor er stoppet hvordan vil du fortsætte?\n" +
-                    "1) Brug et repair kit\n" +
-                    "2) Forsøg at genstarte motoren (Lav succesrate)\n");
+        gameView.printMessage("\n----Event Motorfejl----\n" +
+                "Din motor er stoppet!");
+
+        boolean engineRunning = false;
+        int attempts = 0;
+
+        while (!engineRunning) {
+            gameView.printStatus(spaceship);
+
+                gameView.printMessage("\nMuligheder:\n" +
+                        "1) Brug et repair kit (Sikker succes)\n" +
+                        "2) Forsøg at genstarte motoren (Risikabelt - Forsøg nr. " + (attempts + 1) + ")\n");
 
             int choice = gameView.readUserInput("Dit valg: ");
-            try {
-                if (choice == 1) {
-                    if (spaceship.getRepairKit() > 0) {
-                        spaceship.useRepairKit(1);
-                        gameView.printMessage("Du brugte et repair kit og fik motoren i gang igen!");
-                        log.add("Event Motorfejl: Brugte et repair kit og fik motoren i gang igen.");
-                        stopped = false;
-                    } else {
-                        gameView.printMessage("Du har ingen repair kits! Forsøger at genstarte motoren...");
-                        log.add("Event Motorfejl: Ingen repair kits, forsøgte at genstarte motoren.");
-                        attemptEngineStart();
-                        break;
-                    }
-                } else if (choice == 2) {
-                    attemptEngineStart();
+
+            if (choice == 1) {
+                if (spaceship.getRepairKit() > 0) {
+                    spaceship.useRepairKit(1);
+                    gameView.printMessage("Du brugte et repair kit...");
+                    log.add("Event Motorfejl: Brugte Repair Kit og fixede motoren.");
+                    engineRunning = true;
                 } else {
-                    gameView.printMessage("Ugyldigt valg, prøv igen.");
+                    gameView.printMessage("Du har ikke flere repair kits. Du må bruge manuel genstart.");
+
                 }
-            } catch (IllegalArgumentException e) {
-                gameView.printMessage("FEJL: " + e.getMessage());
+
+                if (choice == 2) {
+                    gameView.printMessage("Gør klar til manuel genstart...");
+                    try {
+                        attemptEngineStart();
+                        engineRunning = true;
+                        gameView.printMessage("Motoren startede igen!");
+                        log.add("Event Motorfejl: Manuel genstart lykkedes ved forsøg " + (attempts + 1));
+
+                    } catch (EngineFailureException e) {
+                        attempts++;
+                        int damage = random.nextInt(30) + 5;
+                        spaceship.takeDamage(damage);
+
+                        gameView.printMessage("FEJL: " + e.getMessage());
+                        gameView.printMessage("Skibet tog " + damage + " skade.");
+                        log.add("Event Motorfejl: Genstart fejlede (Forsøg " + attempts + ").");
+                        checkGameOverStatus();
+                        checkCriticalStatus();
+                    }
+                }
             }
         }
-        checkCriticalStatus();
-        checkGameOverStatus();
     }
 
-    private void attemptEngineStart() {
+    private void attemptEngineStart () {
         int chance = random.nextInt(100) + 1;
-        if (chance < 30) {
-            gameView.printMessage("Motoren startede igen!");
-            log.add("Event Motorfejl: Motoren startede igen.");
-        } else {
-            int damage = random.nextInt(20) + 1;
-            spaceship.takeDamage(damage);
-            gameView.printMessage("Motoren startede ikke, og skibet tog " + damage + " skade i processen.");
-            log.add("Event Motorfejl: Motoren startede ikke, og skibet tog " + damage + " skade.");
+        if (chance > 30) {
+            throw new EngineFailureException("Motoren hoster, hakker og går i stå igen!");
         }
     }
 }
