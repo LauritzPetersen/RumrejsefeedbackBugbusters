@@ -13,10 +13,14 @@ public class GameView {
 
 
     public int readUserInput(String prompt) throws NumberFormatException {
-        while(true){
-            System.out.println(prompt);
-            return Integer.parseInt(scanner.nextLine());
-
+        while(true) {
+            try {
+                System.out.println(prompt);
+                String input = scanner.nextLine();
+                return Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.println("Ugyldigt input. Skriv venligst et tal.");
+            }
         }
     }
     public String readLine(String prompt){
@@ -46,8 +50,8 @@ public class GameView {
                             "Brændstof:    " + spaceship.getFuel() + "\n" +
                             "Integritet    " + spaceship.getIntegrity() + "\n" +
                             "Reservedele:  " + spaceship.getSpareParts() + "\n" +
-                            "Skjold:       " + spaceship.getShieldLevel() + "\n"+
-                            "Repair kit:   " + spaceship.isRepairKitUsed() +
+                            "Skjold level:       " + spaceship.getShieldLevel() + "\n"+
+                            "Repair kits:   " + spaceship.getRepairKit() +
                             "\n-------------------\n");
     }
 

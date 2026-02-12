@@ -8,16 +8,15 @@ public class Spaceship {
     private String captain;
     private int fuel = 100;
     private int integrity = 100;
-    private int spareParts = 10;
+    private int spareParts = 5;
     private int shieldLevel = 0;
-    private boolean repairKitUsed = false;
-
-    private final ArrayList<String> log = new ArrayList<>();
+    private int repairKit = 1;
 
     public Spaceship(String name, String captain) {
         this.name = name;
         this.captain = captain;
     }
+
 
     public void burnFuel(int amount){
         this.fuel -= amount;
@@ -29,6 +28,7 @@ public class Spaceship {
         this.fuel += amount;
     }
 
+
     public int takeDamage(int amount){
         this.integrity -= amount;
         if(this.integrity < 0){
@@ -36,6 +36,7 @@ public class Spaceship {
         }
         return this.integrity;
     }
+
 
     public void useSpareParts(int amount){
         this.spareParts -= amount;
@@ -47,17 +48,21 @@ public class Spaceship {
         this.spareParts += amount;
     }
 
+
     public void upgradeShield(){
         this.shieldLevel++;
     }
 
-    public boolean useRepairKit(){
-        if (repairKitUsed){
-            return false;
+    public void useRepairKit(int amount){
+        this.spareParts -= amount;
+        if (this.spareParts < 0){
+            spareParts = 0;
         }
-        repairKitUsed = true;
-        return true;
     }
+    public void gainRepairKit(int amount){
+        this.spareParts += amount;
+    }
+
 
 
     public String getName() {
@@ -78,8 +83,8 @@ public class Spaceship {
     public int getShieldLevel() {
         return shieldLevel;
     }
-    public boolean isRepairKitUsed() {
-        return repairKitUsed;
+    public int getRepairKit() {
+        return repairKit;
     }
 
 
