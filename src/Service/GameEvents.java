@@ -261,18 +261,18 @@ public class GameEvents {
                     log.add("Event Motorfejl: Manuel genstart lykkedes ved forsøg " + (attempts + 1));
                 } catch (EngineFailureException e) {
                     attempts++;
-                    int damage = random.nextInt(30) + 5;
+                    int damage = random.nextInt(35) + 10;
                     if (spaceship.getShieldLevel() > 0) {
                         damage = damage / (spaceship.getShieldLevel() + 1);
-                        spaceship.takeDamage(damage);
-
-                        gameView.printMessage("FEJL: " + e.getMessage());
-                        gameView.printMessage("Skibet tog " + damage + " skade.");
-                        log.add("Event Motorfejl: Genstart fejlede (Forsøg " + attempts + ").");
-
-                        handleStatusChecks();
                     }
-                }
+                    spaceship.takeDamage(damage);
+
+                    gameView.printMessage("FEJL: " + e.getMessage());
+                    gameView.printMessage("Skibet tog " + damage + " skade.");
+                    log.add("Event Motorfejl: Genstart fejlede (Forsøg " + attempts + ").");
+
+                    handleStatusChecks();
+                    }
             } else {
                 gameView.printMessage("Ugyldigt valg, prøv igen.");
             }
