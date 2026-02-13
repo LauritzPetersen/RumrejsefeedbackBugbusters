@@ -1,8 +1,5 @@
 package Service;
 
-import Model.CriticalStatusException;
-import Model.GameOverException;
-import Service.InvalidTradeException;
 import Model.Spaceship;
 import View.GameView;
 import java.util.ArrayList;
